@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "react-docker-app"
+        IMAGE_NAME = "react_react-app"
         DOCKER_HUB_REPO = "your-dockerhub-username/react-docker-app"
     }
 
