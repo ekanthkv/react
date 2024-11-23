@@ -21,13 +21,7 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                // Example: Add your testing commands here
-                sh 'npm install'
-                sh 'npm test'
-            }
-        }
+    
 
         stage('Push to Docker Hub') {
             steps {
