@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        DOCKER_USERNAME = 'ekanthkv' // Your Docker Hub username
         IMAGE_NAME = "react_react-app"
         DOCKER_HUB_REPO = "your-dockerhub-username/react-docker-app"
     }
@@ -27,8 +28,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credential') {
-                        docker tag react_react-app ekanthkv/react-docker-app:latest
-                        docker push ekanthkv/react-docker-app:latest
+                        docker tag react_react-app $DOCKER_USERNAME/react-docker-app:latest
+                        docker push $DOCKER_USERNAME/react-docker-app:latest
                     }
                 }
             }
