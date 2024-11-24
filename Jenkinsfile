@@ -41,11 +41,21 @@ pipeline {
     steps {
         timeout(time: 5, unit: 'MINUTES') {
             script {
-                // Wait for SonarQube Quality Gate result
-                def qualityGate = waitForQualityGate()
-                // Check the Quality Gate status
-                if (qualityGate.status != 'OK') {
-                    error "Pipeline aborted due to Quality Gate failure: ${qualityGate.status}"
+                def taskId = sh(
+                    script: "cat .scannerwork/report-task.txt | grep ceTaskId | cut -d '=' -f2",
+                    returnStdout: true
+                ).trim()
+                def sonarUrl = "http://localhost:9000/api/ce/task?id=${taskId}"
+                def response = sh(
+                    script: "curl -s -u sqa_29583452235b93338dedb657fddffb6dc6585a81: $sonarUrl",
+                    returnStdout: true
+                ).trim()
+                def status = sh(
+                    script: "echo '${response}' | jq -r '.task.status'",
+                    returnStdout: true
+                ).trim()
+                if (status != 'SUCCESS') {
+                    error "Quality Gate failed with status: ${status}"
                 }
             }
         }
