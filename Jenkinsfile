@@ -30,6 +30,18 @@ pipeline {
                 }
             }
         }
+
+        stage('Quality Gate') {
+            steps {
+                script {
+                    def qg = waitForQualityGate()
+                    echo "Quality Gate Result: ${qg}"
+            if (qg.status != 'OK') {
+                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    }
+                }
+            }
+        }
         
         stage('Build Docker Image') {
             steps {
