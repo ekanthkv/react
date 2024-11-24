@@ -41,7 +41,7 @@ pipeline {
         stage('Push to Nexus') {
             steps {
                 script {
-                    docker.withRegistry("${NEXUS_REPO_URL}", 'nexus-credential') {
+                    docker.withRegistry("${NEXUS_REPO_URL}", 'nexus-credentials') {
                         // Tag the image for Nexus
                         sh "docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${VERSION} nexus-server:8081/repository/docker-releases/${IMAGE_NAME}:${VERSION}"
                         
