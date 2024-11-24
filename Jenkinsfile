@@ -31,8 +31,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credential') {
-                      sh  "docker tag react_react-app ${DOCKER_USERNAME}/react-docker-app:latest"
-                       sh "docker push ${DOCKER_USERNAME}/react-docker-app:latest"
+                      sh  "docker tag react_react-app ${DOCKER_USERNAME}/react_react-app:latest"
+                       sh "docker push ${DOCKER_USERNAME}/react_react-app:latest"
                     }
                 }
             }
