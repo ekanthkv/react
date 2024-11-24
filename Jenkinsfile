@@ -17,6 +17,20 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Ensure you set the correct name used in Jenkins configuration
+                    def scannerHome = tool 'SonarScanner' // This should match the name from Jenkins configuration
+                    withSonarQubeEnv('SonarQubeServer') { // Ensure 'SonarQubeServer' matches your server configuration
+                    echo "Scanner Home: ${scannerHome}"
+                    sh 'echo $PATH'
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=your_project_key -Dsonar.projectName="Your Project Name" -Dsonar.projectVersion=1.0 -Dsonar.sources=src"
+                    }
+                }
+            }
+        }
+        
         stage('Build Docker Image') {
             steps {
                 script {
