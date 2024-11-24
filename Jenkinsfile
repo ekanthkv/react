@@ -43,7 +43,7 @@ pipeline {
                 script {
                     docker.withRegistry("${NEXUS_REPO_URL}", 'nexus-credentials') {
                         // Tag the image for Nexus
-                        sh "docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${VERSION} nexus-server:5000/repository/react1/${IMAGE_NAME}:${VERSION}"
+                        sh "docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:latest nexus-server:5000/repository/react1/${IMAGE_NAME}:${VERSION}"
                         
                         // Push the versioned image to Nexus
                         sh "docker push nexus-server:5000/repository/react1/${IMAGE_NAME}:${VERSION}"
