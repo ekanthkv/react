@@ -5,7 +5,8 @@ pipeline {
         DOCKER_USERNAME = 'ekanthkv' // Your Docker Hub username
         IMAGE_NAME = "react_react-app"
         DOCKER_HUB_REPO = "your-dockerhub-username/react-docker-app"
-        NEXUS_REPOSITORY_URL = 'http://localhost:8081/repository/react/' // Nexus URL
+        VERSION = "1.0.0-${env.BUILD_NUMBER}" // Customize version format
+        NEXUS_REPO_URL = 'http://localhost:8081/repository/react/' // Nexus URL
         NEXUS_CREDENTIALS_ID = 'nexus-credentials' // Nexus Credentials ID in Jenkins
     }
 
@@ -40,11 +41,13 @@ pipeline {
         stage('Push to Nexus') {
             steps {
                 script {
-                    sh """
-                    curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} \
-                        --upload-file ./target/${IMAGE_NAME}.tar \
-                        ${NEXUS_REPOSITORY_URL}/${IMAGE_NAME}:latest
-                    """
+                    docker.withRegistry("${NEXUS_REPO_URL}", 'nexus-credential') {
+                        // Tag the image for Nexus
+                        sh "docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${VERSION} nexus-server:8081/repository/docker-releases/${IMAGE_NAME}:${VERSION}"
+                        
+                        // Push the versioned image to Nexus
+                        sh "docker push nexus-server:8081/repository/docker-releases/${IMAGE_NAME}:${VERSION}"
+                    }
                 }
             }
         }
