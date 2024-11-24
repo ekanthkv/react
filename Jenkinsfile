@@ -28,9 +28,15 @@ pipeline {
                         sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=your_project_key -Dsonar.projectName="Your Project Name" -Dsonar.projectVersion=1.0 -Dsonar.sources=src"
                     }
                 }
+            script {
+        echo "Checking pipeline execution status..."
+        echo "SonarQube analysis status: ${currentBuild.result}"
+    }
             }
         }
 
+        
+        
         stage('Quality Gate') {
     steps {
         timeout(time: 5, unit: 'MINUTES') {
