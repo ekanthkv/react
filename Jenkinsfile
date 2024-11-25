@@ -35,6 +35,7 @@ pipeline {
             steps {
                 script {
                     // Wait for SonarQube Quality Gate result
+                    timeout(time: 5, unit: 'MINUTES')
                     def qg = waitForQualityGate() // Default behavior is to fail the pipeline on a failed quality gate
                     if (qg.status != 'OK') {
                         error "Pipeline aborted due to quality gate failure: ${qg.status}"
