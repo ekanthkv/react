@@ -20,48 +20,38 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // Ensure you set the correct name used in Jenkins configuration
-                    def scannerHome = tool 'SonarScanner' // This should match the name from Jenkins configuration
-                    withSonarQubeEnv('SonarQubeServer') { // Ensure 'SonarQubeServer' matches your server configuration
-                    echo "Scanner Home: ${scannerHome}"
-                    sh 'echo $PATH'
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=your_project_key -Dsonar.projectName="Your Project Name" -Dsonar.projectVersion=1.0 -Dsonar.sources=src"
+                    // Ensure 'SonarScanner' matches the configured tool name in Jenkins
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('SonarQubeServer') { // Ensure 'SonarQubeServer' matches the configured server name
+                        echo "Scanner Home: ${scannerHome}"
+                        sh 'echo $PATH'
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=your_project_key -Dsonar.projectName='Your Project Name' -Dsonar.projectVersion=1.0 -Dsonar.sources=src"
                     }
                 }
-            script {
-        echo "Checking pipeline execution status..."
-        echo "SonarQube analysis status: ${currentBuild.result}"
-    }
             }
         }
-
-        
         
         stage('Quality Gate') {
-    steps {
-        timeout(time: 5, unit: 'MINUTES') {
-            script {
-                def taskId = sh(
-                    script: "cat .scannerwork/report-task.txt | grep ceTaskId | cut -d '=' -f2",
-                    returnStdout: true
-                ).trim()
-                def sonarUrl = "http://localhost:9000/api/ce/task?id=${taskId}"
-                def response = sh(
-                    script: "curl -s -u sqa_29583452235b93338dedb657fddffb6dc6585a81: $sonarUrl",
-                    returnStdout: true
-                ).trim()
-                def status = sh(
-                    script: "echo '${response}' | jq -r '.task.status'",
-                    returnStdout: true
-                ).trim()
-                if (status != 'SUCCESS') {
-                    error "Quality Gate failed with status: ${status}"
+            steps {
+                script {
+                    // Wait for SonarQube Quality Gate result
+                    def qg = waitForQualityGate() // Default behavior is to fail the pipeline on a failed quality gate
+                    if (qg.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    }
                 }
             }
         }
-    }
-}
-
+        
+        stage('Next Stage') {
+            when {
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
+            steps {
+                echo "Proceeding to the next stage..."
+                // Add your next stage tasks here
+            }
+        }
         
         stage('Build Docker Image') {
             steps {
